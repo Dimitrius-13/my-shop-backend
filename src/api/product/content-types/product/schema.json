@@ -1,0 +1,69 @@
+{
+  "kind": "collectionType",
+  "collectionName": "products",
+  "info": {
+    "singularName": "product",
+    "pluralName": "products",
+    "displayName": "Product"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "price": {
+      "type": "decimal"
+    },
+    "oldPrice": {
+      "type": "decimal"
+    },
+    "rating": {
+      "type": "decimal"
+    },
+    "isPromo": {
+      "type": "boolean"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "smartphones",
+        "laptops",
+        "gaming",
+        "appliances",
+        "tv",
+        "audio"
+      ]
+    },
+    "description": {
+      "type": "blocks"
+    },
+    "brand": {
+      "type": "enumeration",
+      "enum": [
+        "Apple",
+        "Samsung",
+        "Xiaomi",
+        "Asus",
+        "Sony",
+        "LG",
+        "Lenovo"
+      ]
+    },
+    "specs": {
+      "type": "json"
+    }
+  }
+}

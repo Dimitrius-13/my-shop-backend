@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "orders",
+  "info": {
+    "singularName": "order",
+    "pluralName": "orders",
+    "displayName": "Order"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "clientName": {
+      "type": "string"
+    },
+    "clientPhone": {
+      "type": "string"
+    },
+    "total": {
+      "type": "decimal"
+    },
+    "orderDetails": {
+      "type": "text"
+    }
+  }
+}
