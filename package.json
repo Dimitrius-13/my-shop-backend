@@ -15,6 +15,8 @@
     "upgrade:dry": "npx @strapi/upgrade latest --dry"
   },
   "dependencies": {
+    "@cloudinary/react": "^1.14.3",
+    "@cloudinary/url-gen": "^1.22.0",
     "@strapi/plugin-cloud": "5.31.3",
     "@strapi/plugin-users-permissions": "5.31.3",
     "@strapi/strapi": "5.31.3",
