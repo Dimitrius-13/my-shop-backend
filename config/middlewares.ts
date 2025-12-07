@@ -29,7 +29,23 @@ module.exports = [
       },
     },
   },
-  'strapi::cors',
+  {
+    // --- ВИПРАВЛЕНИЙ БЛОК CORS (Critical Fix) ---
+    name: 'strapi::cors',
+    config: {
+      enabled: true,
+      headers: '*',
+      origin: [
+        'http://localhost:3000', // Для локальної розробки
+        'https://megastore-tech.pp.ua', // Ваш основний домен Vercel
+        'https://www.megastore-tech.pp.ua', // Ваш домен з WWW
+        'https://megastore-tech.vercel.app', // Якщо ви використовуєте домен Vercel
+        'https://megastore-tech-pp-ua.onrender.com', // Ваш бекенд Render
+        // Можливо, потрібно додати ваш домен Render для адмінки, якщо він інший
+      ],
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
+      keepHeaderOnError: true,
+    },
   'strapi::poweredBy',
   'strapi::logger',
   'strapi::query',
