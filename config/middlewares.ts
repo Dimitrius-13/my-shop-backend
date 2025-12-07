@@ -1,7 +1,8 @@
-// config/middlewares.js
-module.exports = [
+// config/middlewares.ts
+export default [
   'strapi::errors',
   {
+    // Налаштування безпеки
     name: 'strapi::security',
     config: {
       contentSecurityPolicy: {
@@ -30,31 +31,29 @@ module.exports = [
     },
   },
   {
-    // --- ВИПРАВЛЕНИЙ БЛОК CORS (Critical Fix) ---
+    // Fix CORS (Дозволяємо фронтенд)
     name: 'strapi::cors',
     config: {
       enabled: true,
       headers: '*',
       origin: [
-        'http://localhost:3000', // Для локальної розробки
-        'https://megastore-tech.pp.ua', // Ваш основний домен Vercel
-        'https://www.megastore-tech.pp.ua', // Ваш домен з WWW
-        'https://megastore-tech.vercel.app', // Якщо ви використовуєте домен Vercel
-        'https://megastore-tech-pp-ua.onrender.com', // Ваш бекенд Render
-        // Можливо, потрібно додати ваш домен Render для адмінки, якщо він інший
+        'http://localhost:3000',
+        'https://megastore-tech.pp.ua',
+        'https://www.megastore-tech.pp.ua',
+        'https://megastore-tech-pp-ua.onrender.com', // Замініть на свій реальний домен Render
       ],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
       keepHeaderOnError: true,
     },
+  },
   'strapi::poweredBy',
   'strapi::logger',
   'strapi::query',
-  // --- ТУТ БУВ ДУБЛІКАТ 'strapi::body', МИ ЙОГО ВИДАЛИЛИ ---
   'strapi::session',
   'strapi::favicon',
   'strapi::public',
-  // --- ЗАЛИШАЄМО ЛИШЕ ЦЕЙ БЛОК З НАЛАШТУВАННЯМИ ЛІМІТУ ---
   {
+    // Fix Payload Limit (Заміна для 'strapi::body' middleware)
     name: 'strapi::body',
     config: {
       jsonLimit: '25mb',
