@@ -2,7 +2,7 @@
 module.exports = ({ env }) => ({
   upload: {
     config: {
-      // --- ЦЕЙ БЛОК ПРИБИРАЄ ПОПЕРЕДЖЕННЯ ---
+      // --- БЛОК, ЩО ПРИБИРАЄ ПОПЕРЕДЖЕННЯ ---
       security: {
         // Дозволяємо тільки безпечні типи зображень
         allowedMimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
