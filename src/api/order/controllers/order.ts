@@ -71,7 +71,8 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
         try {
           // Оновлюємо статус в БД Strapi
           const updatedOrder = await strapi.entityService.update('api::order.order', orderId, {
-            data: { status: newStatus }
+  data: { status: newStatus } as any
+});
           });
 
           const botToken = process.env.TG_BOT_TOKEN;
