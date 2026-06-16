@@ -22,6 +22,9 @@
     },
     "orderDetails": {
       "type": "text"
+    },
+    "deliveryAddress": {
+      "type": "string"
     }
   }
 }
