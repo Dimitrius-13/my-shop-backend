@@ -1,20 +1,24 @@
-// import type { Core } from '@strapi/strapi';
+'use strict';
 
-export default {
-  /**
-   * An asynchronous register function that runs before
-   * your application is initialized.
-   *
-   * This gives you an opportunity to extend code.
-   */
-  register(/* { strapi }: { strapi: Core.Strapi } */) {},
+module.exports = {
+  register(/*{ strapi }*/) {},
 
-  /**
-   * An asynchronous bootstrap function that runs before
-   * your application gets started.
-   *
-   * This gives you an opportunity to set up your data model,
-   * run jobs, or perform some special logic.
-   */
-  bootstrap(/* { strapi }: { strapi: Core.Strapi } */) {},
+  async bootstrap({ strapi }) {
+    // Отримуємо доступ до внутрішнього сховища налаштувань плагіна
+    const pluginStore = strapi.store({
+      environment: '',
+      type: 'plugin',
+      name: 'users-permissions',
+    });
+
+    // Витягуємо поточні Advanced Settings
+    const settings = await pluginStore.get({ key: 'advanced' });
+
+    // Якщо підтвердження пошти увімкнено — жорстко вимикаємо його
+    if (settings && settings.email_confirmation) {
+      settings.email_confirmation = false;
+      await pluginStore.set({ key: 'advanced', value: settings });
+      console.log('✅ Email confirmation forcibly disabled via bootstrap');
+    }
+  },
 };
