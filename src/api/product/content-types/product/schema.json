@@ -53,14 +53,13 @@
     "brand": {
       "type": "enumeration",
       "enum": [
-        "Apple",
-        "Samsung",
-        "Xiaomi",
-        "Asus",
-        "Sony",
-        "LG",
-        "Lenovo"
-      ]
+  "Apple", "Samsung", "Xiaomi", "Motorola", "Google", "OnePlus", "Sony", "Nokia", "Huawei", "Honor", "Oppo", "Vivo", "Realme", "Nothing",
+  "Lenovo", "ASUS", "Acer", "Dell", "HP", "MSI", "Gigabyte", "Razer", "Microsoft", "Framework",
+  "Nintendo", "Valve", "Logitech", "Corsair", "SteelSeries", "HyperX",
+  "LG", "TCL", "Philips", "Panasonic", "Hisense", "BenQ", "AOC",
+  "JBL", "Marshall", "Bose", "Sennheiser", "Audio-Technica", "Edifier",
+  "TP-Link", "Ubiquiti", "Garmin", "DJI", "GoPro"
+]
     },
     "specs": {
       "type": "json"
