@@ -50,11 +50,6 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
     return response;
   },
 
-  async webHook(ctx) {
-    // Вебхук метод зазвичай пишеться з маленької або camelCase відповідно до твоїх роутів
-    // Переконайся, що в роутах назва методу збігається (order.webhook)
-  },
-
   async webhook(ctx) {
     const body = ctx.request.body as any;
 
@@ -66,8 +61,6 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
       if (data && data.startsWith('status_')) {
         const parts = data.split('_');
         const newStatus = parts[1];
-        
-        // КЛЮЧОВИЙ ФІКС: Явно кастимо до інта для Postgres
         const orderId = Number(parts[2]); 
 
         console.log(`🔄 ТГ Вебхук: спроба змінити статус ордера #${orderId} на "${newStatus}"`);
@@ -77,7 +70,8 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
             data: { status: newStatus } as any
           });
 
-          console.log(`💾 Статус в базі успішно змінено. Поточний стан в БД:`, updatedOrder.status);
+          // ФІКС ТИПІЗАЦІЇ ДЛЯ КОНСОЛІ
+          console.log(`💾 Статус в базі успішно змінено на:`, (updatedOrder as any).status);
 
           const botToken = process.env.TG_BOT_TOKEN;
 
