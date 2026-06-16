@@ -1,21 +1,20 @@
-'use strict';
+import { factories } from '@strapi/strapi';
 
-const { createCoreController } = require('@strapi/strapi').factories;
-
-module.exports = createCoreController('api::order.order', ({ strapi }) => ({
+export default factories.createCoreController('api::order.order', ({ strapi }) => ({
   async create(ctx) {
     console.log('====================================');
     console.log('📥 КОНТРОЛЕР ORDER ВИКЛИКАНО');
     console.log('Вхідні дані з фронта:', JSON.stringify(ctx.request.body));
     console.log('====================================');
 
-    // Забираємо дані прямо з реквесту, так 100% надійно для будь-якої версії Strapi
-    const { clientName, clientPhone, total, orderDetails, deliveryAddress } = ctx.request.body.data || {};
+    // Кастимо body до any, щоб TS не сварився на поля
+    const requestBody = ctx.request.body as any;
+    const { clientName, clientPhone, total, orderDetails, deliveryAddress } = requestBody.data || {};
 
-    // 1. Спочатку залізобетонно пишемо в базу
+    // 1. Запис в базу
     const response = await super.create(ctx);
 
-    // 2. Робимо прямий синхронний запит до ТГ без фонових таймаутів (для дебагу)
+    // 2. Блок Telegram
     try {
       const botToken = process.env.TG_BOT_TOKEN || 'ТВІЙ_ТОКЕН_ТУТ';
       const chatId = process.env.TG_CHAT_ID || 'ТВІЙ_CHAT_ID_ТУТ';
@@ -44,19 +43,20 @@ module.exports = createCoreController('api::order.order', ({ strapi }) => ({
         })
       });
 
-      const tgData = await tgRes.json();
+      // TS Fix: Явний каст до any + використання нативного tgRes.ok
+      const tgData = await tgRes.json() as any;
       
-      if (tgData.ok) {
+      if (tgRes.ok) {
         console.log('✅ Telegram API повернув успіх:', tgData);
       } else {
         console.error('❌ Telegram API відхилив запит:', tgData);
       }
 
-    } catch (tgError) {
+    } catch (tgError: any) {
       console.error('💥 КРИТИЧНА ПОМИЛКА В БЛОЦІ ТГ:', tgError.message);
     }
 
-    // 3. Повертаємо відповідь фронту
+    // 3. Віддаємо респонс фронту
     return response;
   }
 }));
