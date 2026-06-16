@@ -1,7 +1,7 @@
 import { factories } from '@strapi/strapi';
 
 // Функція-генератор повідомлення (щоб не дублювати код)
-const buildMessage = (attrs) => {
+const buildMessage = (attrs: any) => {
   return `🔥 <b>ЗАМОВЛЕННЯ #${attrs.id || ''}</b>\n\n` +
          `📝 <b>Статус:</b> ${attrs.status || 'Нове'}\n` +
          `👤 <b>Клієнт:</b> ${attrs.clientName || 'Не вказано'}\n` +
@@ -12,7 +12,7 @@ const buildMessage = (attrs) => {
 };
 
 // Генератор клавіатури
-const buildKeyboard = (orderId) => ({
+const buildKeyboard = (orderId: string | number) => ({
   inline_keyboard: [
     [
       { text: "⏳ В обробку", callback_data: `status_В обробці_${orderId}` },
@@ -65,19 +65,20 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
       const chatId = message.chat.id;
       const messageId = message.message_id;
 
-      if (data.startsWith('status_')) {
-        const [, newStatus, orderId] = data.split('_');
+      if (data && data.startsWith('status_')) {
+        const parts = data.split('_');
+        const newStatus = parts[1];
+        const orderId = parts[2];
 
         try {
-          // Оновлюємо статус в БД Strapi
+          // Оновлюємо статус в БД Strapi (з кастом до any через типи Strapi)
           const updatedOrder = await strapi.entityService.update('api::order.order', orderId, {
-  data: { status: newStatus } as any
-});
+            data: { status: newStatus } as any
           });
 
           const botToken = process.env.TG_BOT_TOKEN;
 
-          // Відповідаємо Телеграму, щоб кнопка перестала "крутитися" (спливашка)
+          // Відповідаємо Телеграму, щоб кнопка перестала "крутитися"
           await fetch(`https://api.telegram.org/bot${botToken}/answerCallbackQuery`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -87,7 +88,7 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
             })
           });
 
-          // Перемальовуємо сам текст повідомлення з новим статусом
+          // Перемальовуємо сам текст повідомлення
           await fetch(`https://api.telegram.org/bot${botToken}/editMessageText`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -96,18 +97,19 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
               message_id: messageId,
               text: buildMessage(updatedOrder),
               parse_mode: 'HTML',
-              reply_markup: buildKeyboard(orderId) // залишаємо кнопки, щоб можна було міняти далі
+              reply_markup: buildKeyboard(orderId)
             })
           });
 
-          ctx.send({ ok: true });
+          return ctx.send({ ok: true });
         } catch (e) {
-          console.error(e);
-          ctx.send({ error: 'Помилка оновлення' }, 500);
+          console.error('Помилка оновлення статусу:', e);
+          return ctx.send({ error: 'Помилка оновлення' }, 500);
         }
       }
-    } else {
-      ctx.send({ ok: true }); // Для звичайних повідомлень просто глушимо
     }
+    
+    // Для звичайних повідомлень або якщо щось пішло не так
+    return ctx.send({ ok: true });
   }
 }));
