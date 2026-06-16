@@ -1,6 +1,5 @@
 import { factories } from '@strapi/strapi';
 
-// Функція-генератор повідомлення (щоб не дублювати код)
 const buildMessage = (attrs: any) => {
   return `🔥 <b>ЗАМОВЛЕННЯ #${attrs.id || ''}</b>\n\n` +
          `📝 <b>Статус:</b> ${attrs.status || 'Нове'}\n` +
@@ -11,7 +10,6 @@ const buildMessage = (attrs: any) => {
          `📦 <b>Товари:</b>\n${attrs.orderDetails || 'Не вказано'}`;
 };
 
-// Генератор клавіатури
 const buildKeyboard = (orderId: string | number) => ({
   inline_keyboard: [
     [
@@ -25,11 +23,8 @@ const buildKeyboard = (orderId: string | number) => ({
 });
 
 export default factories.createCoreController('api::order.order', ({ strapi }) => ({
-  // 1. СТВОРЕННЯ ЗАМОВЛЕННЯ
   async create(ctx) {
     const response = await super.create(ctx);
-    
-    // Додаємо ID до атрибутів для шаблонізатора
     const attrs = { ...response.data.attributes, id: response.data.id };
 
     try {
@@ -55,11 +50,14 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
     return response;
   },
 
-  // 2. ОБРОБКА КЛІКІВ З ТЕЛЕГРАМУ
+  async webHook(ctx) {
+    // Вебхук метод зазвичай пишеться з маленької або camelCase відповідно до твоїх роутів
+    // Переконайся, що в роутах назва методу збігається (order.webhook)
+  },
+
   async webhook(ctx) {
     const body = ctx.request.body as any;
 
-    // Перевіряємо, чи це клік по кнопці
     if (body.callback_query) {
       const { id: queryId, data, message } = body.callback_query;
       const chatId = message.chat.id;
@@ -68,27 +66,27 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
       if (data && data.startsWith('status_')) {
         const parts = data.split('_');
         const newStatus = parts[1];
-        const orderId = parts[2];
+        
+        // КЛЮЧОВИЙ ФІКС: Явно кастимо до інта для Postgres
+        const orderId = Number(parts[2]); 
+
+        console.log(`🔄 ТГ Вебхук: спроба змінити статус ордера #${orderId} на "${newStatus}"`);
 
         try {
-          // Оновлюємо статус в БД Strapi (з кастом до any через типи Strapi)
           const updatedOrder = await strapi.entityService.update('api::order.order', orderId, {
             data: { status: newStatus } as any
           });
 
+          console.log(`💾 Статус в базі успішно змінено. Поточний стан в БД:`, updatedOrder.status);
+
           const botToken = process.env.TG_BOT_TOKEN;
 
-          // Відповідаємо Телеграму, щоб кнопка перестала "крутитися"
           await fetch(`https://api.telegram.org/bot${botToken}/answerCallbackQuery`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              callback_query_id: queryId,
-              text: `✅ Статус змінено на: ${newStatus}`
-            })
+            body: JSON.stringify({ callback_query_id: queryId, text: `✅ Статус змінено на: ${newStatus}` })
           });
 
-          // Перемальовуємо сам текст повідомлення
           await fetch(`https://api.telegram.org/bot${botToken}/editMessageText`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -102,14 +100,12 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
           });
 
           return ctx.send({ ok: true });
-        } catch (e) {
-          console.error('Помилка оновлення статусу:', e);
+        } catch (e: any) {
+          console.error('❌ Помилка апдейту статусу в БД:', e.message);
           return ctx.send({ error: 'Помилка оновлення' }, 500);
         }
       }
     }
-    
-    // Для звичайних повідомлень або якщо щось пішло не так
     return ctx.send({ ok: true });
   }
 }));
