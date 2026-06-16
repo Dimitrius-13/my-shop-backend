@@ -7,9 +7,8 @@
     "displayName": "Order"
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
-  "pluginOptions": {},
   "attributes": {
     "clientName": {
       "type": "string"
@@ -25,6 +24,16 @@
     },
     "deliveryAddress": {
       "type": "string"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "Нове",
+        "В обробці",
+        "Відправлено",
+        "Виконано"
+      ],
+      "default": "Нове"
     }
   }
 }
