@@ -24,17 +24,15 @@ const buildKeyboard = (orderId: string | number) => ({
 
 export default factories.createCoreController('api::order.order', ({ strapi }) => ({
   async create(ctx) {
+    // 1. Створюємо запис стандартним контролером
     const response = await super.create(ctx);
-    
     const orderId = response.data.id;
-    // Кастимо до any, щоб обійти відсутність поля в типі
+
+    // 2. Витягуємо свіжий, гарантовано повний і плоский об'єкт прямо з БД
     const fullOrder = await strapi.entityService.findOne('api::order.order', orderId) as any;
-    
-    const attrs = { 
-      ...response.data.attributes, 
-      id: orderId,
-      status: fullOrder?.status || 'Нове' // Додали безпечне звернення
-    };
+
+    // Якщо статус чомусь пустий, ставимо дефолт
+    if (!fullOrder.status) fullOrder.status = 'Нове';
 
     try {
       const botToken = process.env.TG_BOT_TOKEN;
@@ -47,9 +45,9 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: chatId,
-          text: buildMessage(attrs),
+          text: buildMessage(fullOrder), // ТЕПЕР ТУТ ІДЕАЛЬНО ПЛОСКИЙ ОБ'ЄКТ
           parse_mode: 'HTML',
-          reply_markup: buildKeyboard(attrs.id)
+          reply_markup: buildKeyboard(orderId)
         })
       });
     } catch (e) {
