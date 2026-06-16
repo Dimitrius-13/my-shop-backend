@@ -24,8 +24,19 @@ const buildKeyboard = (orderId: string | number) => ({
 
 export default factories.createCoreController('api::order.order', ({ strapi }) => ({
   async create(ctx) {
+    // 1. Створюємо
     const response = await super.create(ctx);
-    const attrs = { ...response.data.attributes, id: response.data.id };
+    
+    // 2. Дозапитуємо повний об'єкт з бази, щоб отримати статус, присвоєний Strapi
+    const orderId = response.data.id;
+    const fullOrder = await strapi.entityService.findOne('api::order.order', orderId);
+    
+    // 3. Формуємо об'єкт для бота з актуальним станом
+    const attrs = { 
+      ...response.data.attributes, 
+      id: orderId,
+      status: fullOrder.status // Беремо точно з БД
+    };
 
     try {
       const botToken = process.env.TG_BOT_TOKEN;
