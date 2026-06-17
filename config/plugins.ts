@@ -1,5 +1,4 @@
-// config/plugins.js
-module.exports = ({ env }) => ({
+export default ({ env }: { env: any }) => ({
   upload: {
     config: {
       // --- БЛОК, ЩО ПРИБИРАЄ ПОПЕРЕДЖЕННЯ ---
