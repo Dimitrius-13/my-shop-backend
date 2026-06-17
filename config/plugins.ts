@@ -1,19 +1,6 @@
 export default ({ env }: { env: any }) => ({
   upload: {
     config: {
-      // --- БЛОК, ЩО ПРИБИРАЄ ПОПЕРЕДЖЕННЯ ---
-      security: {
-        // Дозволяємо тільки безпечні типи зображень
-        allowedMimeTypes: [
-          "image/jpeg",
-          "image/png",
-          "image/gif",
-          "image/webp",
-        ],
-        maxFileSize: 5 * 1024 * 1024, // Обмеження розміру 5MB
-      },
-      // --------------------------------------
-
       provider: "cloudinary",
       providerOptions: {
         cloud_name: env("CLOUDINARY_NAME"),
@@ -24,6 +11,9 @@ export default ({ env }: { env: any }) => ({
         upload: {},
         delete: {},
       },
+      // ЖОРСТКИЙ ФІКС ПАМ'ЯТІ: Вимикаємо локальний ресайз і створення копій
+      responsiveDimensions: false,
+      skipResponsiveDimensions: true,
     },
   },
 });
