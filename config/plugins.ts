@@ -1,17 +1,17 @@
-export default ({ env }: { env: any }) => ({
+export default () => ({
   upload: {
     config: {
       provider: "cloudinary",
       providerOptions: {
-        cloud_name: env("CLOUDINARY_NAME"),
-        api_key: env("CLOUDINARY_KEY"),
-        api_secret: env("CLOUDINARY_SECRET"),
+        cloud_name: "dtmb3momt",
+        api_key: "361327885255856",
+        api_secret: "CmyfslUABHXtVjzx1nzF_1IBkTw",
       },
       actionOptions: {
         upload: {},
         delete: {},
       },
-      // ЖОРСТКИЙ ФІКС ПАМ'ЯТІ: Вимикаємо локальний ресайз і створення копій
+      // Вимикаємо локальний ресайз, щоб не падав Render по пам'яті
       responsiveDimensions: false,
       skipResponsiveDimensions: true,
     },
